@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: DevFix AI analysis backend. Configuration only; inference disabled by default.
+
+Parameters:
+  FrontendOrigin:
+    Type: String
+    Default: http://localhost:3000
+    AllowedPattern: 'https://[a-zA-Z0-9.-]+|http://localhost:[0-9]+'
+    Description: Exact frontend origin, without a trailing slash. No wildcard CORS.
+  BedrockModelId:
+    Type: String
+    Default: mistral.ministral-3-3b-instruct
+    AllowedValues:
+      - mistral.ministral-3-3b-instruct
+      - mistral.ministral-3-8b-instruct
+      - mistral.mistral-7b-instruct-v0:2
+      - qwen.qwen3-coder-30b-a3b-v1:0
+  EnableBedrockInference:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['false', 'true']
+    Description: Set true only after explicit approval for model invocations.
+
+Rules:
+  MumbaiOnly:
+    Assertions:
+      - Assert: !Equals [!Ref 'AWS::Region', ap-south-1]
+        AssertDescription: DevFix AI resources must stay in the selected Region, Mumbai.
+
+Resources:
+  AnalysisLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-analyze'
+      RetentionInDays: 7
+
+  AnalysisRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeSelectedModel
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: bedrock:InvokeModel
+                Resource: !Sub 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${BedrockModelId}'
+        - PolicyName: WriteAnalysisLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !GetAtt AnalysisLogGroup.Arn
+
+  AnalysisApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      CorsConfiguration:
+        AllowOrigins: [!Ref FrontendOrigin]
+        AllowMethods: [POST]
+        AllowHeaders: [content-type]
+        MaxAge: 300
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 2
+        ThrottlingRateLimit: 0.2
+
+  AnalyzeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-analyze'
+      CodeUri: ../build/backend/
+      Handler: index.handler
+      Runtime: nodejs24.x
+      Architectures: [arm64]
+      MemorySize: 256
+      Timeout: 25
+      # Use the regional unreserved concurrency pool; no quota increase required.
+      Role: !GetAtt AnalysisRole.Arn
+      Environment:
+        Variables:
+          BEDROCK_REGION: !Ref 'AWS::Region'
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          DEVFIX_BEDROCK_ENABLED: !Ref EnableBedrockInference
+      Events:
+        Analyze:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AnalysisApi
+            Path: /api/analyze
+            Method: POST
+            PayloadFormatVersion: '2.0'
+
+Outputs:
+  AnalysisApiUrl:
+    Description: Full POST endpoint URL for DEVFIX_API_URL.
+    Value: !Sub 'https://${AnalysisApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/api/analyze'
