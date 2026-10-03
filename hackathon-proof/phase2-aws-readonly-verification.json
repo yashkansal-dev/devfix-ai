@@ -1,0 +1,137 @@
+{
+  "region": "ap-south-1",
+  "profile": "yashkansal",
+  "scope": "Read-only availability and concurrency inspection; no model invocation or AWS resource changes",
+  "checks": {
+    "bedrock": {
+      "resultFileWrittenAt": "2026-10-01T11:20:49.127552+00:00",
+      "tool": "aws___run_script via AWS MCP",
+      "result": {
+        "qwen.qwen3-coder-30b-a3b-v1:0": {
+          "modelId": "qwen.qwen3-coder-30b-a3b-v1",
+          "agreementAvailability": {
+            "status": "AVAILABLE"
+          },
+          "authorizationStatus": "NOT_AUTHORIZED",
+          "entitlementAvailability": "AVAILABLE",
+          "regionAvailability": "AVAILABLE"
+        },
+        "mistral.ministral-3-3b-instruct": {
+          "modelId": "mistral.ministral-3-3b-instruct",
+          "agreementAvailability": {
+            "status": "AVAILABLE"
+          },
+          "authorizationStatus": "NOT_AUTHORIZED",
+          "entitlementAvailability": "AVAILABLE",
+          "regionAvailability": "AVAILABLE"
+        },
+        "mistral.ministral-3-8b-instruct": {
+          "modelId": "mistral.ministral-3-8b-instruct",
+          "agreementAvailability": {
+            "status": "AVAILABLE"
+          },
+          "authorizationStatus": "NOT_AUTHORIZED",
+          "entitlementAvailability": "AVAILABLE",
+          "regionAvailability": "AVAILABLE"
+        },
+        "google.gemma-3-4b-it": {
+          "modelId": "google.gemma-3-4b-it",
+          "agreementAvailability": {
+            "status": "AVAILABLE"
+          },
+          "authorizationStatus": "NOT_AUTHORIZED",
+          "entitlementAvailability": "AVAILABLE",
+          "regionAvailability": "AVAILABLE"
+        },
+        "openai.gpt-oss-20b-1:0": {
+          "modelId": "openai.gpt-oss-20b-1",
+          "agreementAvailability": {
+            "status": "AVAILABLE"
+          },
+          "authorizationStatus": "NOT_AUTHORIZED",
+          "entitlementAvailability": "AVAILABLE",
+          "regionAvailability": "AVAILABLE"
+        },
+        "meta.llama3-8b-instruct-v1:0": {
+          "modelId": "meta.llama3-8b-instruct-v1",
+          "agreementAvailability": {
+            "status": "AVAILABLE"
+          },
+          "authorizationStatus": "NOT_AUTHORIZED",
+          "entitlementAvailability": "AVAILABLE",
+          "regionAvailability": "AVAILABLE"
+        },
+        "mistral.mistral-7b-instruct-v0:2": {
+          "modelId": "mistral.mistral-7b-instruct-v0",
+          "agreementAvailability": {
+            "status": "AVAILABLE"
+          },
+          "authorizationStatus": "NOT_AUTHORIZED",
+          "entitlementAvailability": "AVAILABLE",
+          "regionAvailability": "AVAILABLE"
+        }
+      },
+      "apiCalls": [
+        {
+          "service": "bedrock",
+          "operation": "GetFoundationModelAvailability",
+          "status": "success"
+        },
+        {
+          "service": "bedrock",
+          "operation": "GetFoundationModelAvailability",
+          "status": "success"
+        },
+        {
+          "service": "bedrock",
+          "operation": "GetFoundationModelAvailability",
+          "status": "success"
+        },
+        {
+          "service": "bedrock",
+          "operation": "GetFoundationModelAvailability",
+          "status": "success"
+        },
+        {
+          "service": "bedrock",
+          "operation": "GetFoundationModelAvailability",
+          "status": "success"
+        },
+        {
+          "service": "bedrock",
+          "operation": "GetFoundationModelAvailability",
+          "status": "success"
+        },
+        {
+          "service": "bedrock",
+          "operation": "GetFoundationModelAvailability",
+          "status": "success"
+        }
+      ]
+    },
+    "lambda": {
+      "resultFileWrittenAt": "2026-10-01T12:04:29.024225+00:00",
+      "tool": "aws___run_script via AWS MCP",
+      "result": {
+        "AccountLimit": {
+          "TotalCodeSize": 322122547200,
+          "CodeSizeUnzipped": 262144000,
+          "CodeSizeZipped": 52428800,
+          "ConcurrentExecutions": 10,
+          "UnreservedConcurrentExecutions": 10
+        },
+        "AccountUsage": {
+          "TotalCodeSize": 0,
+          "FunctionCount": 0
+        }
+      },
+      "apiCalls": [
+        {
+          "service": "lambda",
+          "operation": "GetAccountSettings",
+          "status": "success"
+        }
+      ]
+    }
+  }
+}
